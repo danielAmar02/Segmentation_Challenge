@@ -11,8 +11,8 @@ import pandas as pd
 from tqdm import tqdm
 import tensorflow as tf
 
-from framework.dataset import LandCoverData as LCD
-from framework.utils import YamlNamespace
+from dataset import LandCoverData as LCD
+from utils import YamlNamespace
 
 def numpy_parse_image(image_path):
     """Load an image as numpy array
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
     print(f"Instanciate {config.set} dataset")
     if config.set == 'test':
-        test_files = sorted(config.dataset_folder.glob('test/images/*.tif'))
+        test_files = sorted(config.dataset_folder.glob('Test/test/images/*.tif'))
     else:
         val_samples_s = pd.read_csv(config.xp_dir/'val_samples.csv', squeeze=True)
         val_files = [config.dataset_folder/'train/images/{}.tif'.format(i) for i in val_samples_s]
