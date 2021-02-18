@@ -123,7 +123,7 @@ if __name__ == '__main__':
     for image, mask in train_dataset.take(1):
         sample_batch = (image[:5, ...], mask[:5, ...])
     
-    strxpdir=xpdir.absolute()
+    strxpdir=xp_dir.absolute()
     strxpdir=strxpdir.as_posix()    
     
     callbacks = [
