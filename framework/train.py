@@ -182,3 +182,4 @@ if __name__ == '__main__':
                               class_weight=class_weight
                               )
 
+    model.save('/content/experiments/saved')
