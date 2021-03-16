@@ -15,6 +15,12 @@ from dataset import parse_image, load_image_train, load_image_test
 from model import UNet
 from tensorflow_utils import plot_predictions
 from utils import YamlNamespace
+from os import path
+
+
+if not path.exists('/content/experiments'):
+  Save_model='/content/experiments'
+  os.mkdir(Save_model)
 
 class PlotCallback(tf.keras.callbacks.Callback):
     """A callback used to display sample predictions during training."""
