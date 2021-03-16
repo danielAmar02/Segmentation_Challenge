@@ -24,7 +24,7 @@ def ModelEnhancer(input_shape,
   
     #input_shape = (256, 256, 4)
     
-    VGG16_weight = "../input/keras-pretrained-models/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5"
+    VGG16_weight = "/content/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5"
     VGG16 = vgg16.VGG16(include_top=False, weights=VGG16_weight, input_shape=input_shape)
     last_layer = VGG16.output
     
