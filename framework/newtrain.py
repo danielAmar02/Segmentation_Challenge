@@ -98,7 +98,7 @@ if __name__ == '__main__':
         os.makedirs(weights_path)
     weights_path += '/content/unet_weights.hdf5'
 
-    trainIds = [str(i).zfill(2) for i in range(1, 25)]  # all availiable ids: from "01" to "24"
+    trainIds = [i for i in range(1, 23535)]  # all availiable ids: from "1" to "23535"
     print(trainIds)
     
     
@@ -111,14 +111,17 @@ if __name__ == '__main__':
 
         print('Reading images')
         for img_id in trainIds:
-            img_m = normalize(tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/images/{}.tif'.format(img_id)).transpose([1, 2, 0]))
-            mask = tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/masks/masks/{}.tif'.format(img_id)).transpose([1, 2, 0]) / 255
-            train_xsz = int(3/4 * img_m.shape[0])  # use 75% of image as train and 25% for validation
-            X_DICT_TRAIN[img_id] = img_m[:train_xsz, :, :]
-            Y_DICT_TRAIN[img_id] = mask[:train_xsz, :, :]
-            X_DICT_VALIDATION[img_id] = img_m[train_xsz:, :, :]
-            Y_DICT_VALIDATION[img_id] = mask[train_xsz:, :, :]
-            print(img_id + ' read')
+            try :
+              img_m = normalize(tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/images/{}.tif'.format(img_id)).transpose([1, 2, 0]))
+              mask = tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/masks/masks/{}.tif'.format(img_id)).transpose([1, 2, 0]) / 255
+              train_xsz = int(3/4 * img_m.shape[0])  # use 75% of image as train and 25% for validation
+              X_DICT_TRAIN[img_id] = img_m[:train_xsz, :, :]
+              Y_DICT_TRAIN[img_id] = mask[:train_xsz, :, :]
+              X_DICT_VALIDATION[img_id] = img_m[train_xsz:, :, :]
+              Y_DICT_VALIDATION[img_id] = mask[train_xsz:, :, :]
+              print(img_id + ' read')
+           except FileNotFoundError :
+            pass
         print('Images were read')
 
         def train_net():
@@ -137,6 +140,7 @@ if __name__ == '__main__':
             model.fit(x_train, y_train, batch_size=config.batch_size, epochs=config.epochs,
                       verbose=2, shuffle=True,
                       callbacks=[model_checkpoint, csv_logger, tensorboard],
+                      classe_weight=class_weight_dic,
                       validation_data=(x_val, y_val))
             
             model.save('/content/experiments/saved')
