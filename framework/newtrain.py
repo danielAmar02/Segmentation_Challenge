@@ -76,15 +76,13 @@ if __name__ == '__main__':
    
     
     def get_model(IMG_SiZE,N_CHANNELS,N_CLASSES,num_layers):
-       unet_kwargs = dict(
-        input_shape=(LCD.IMG_SIZE, LCD.IMG_SIZE, LCD.N_CHANNELS),
-        num_classes=LCD.N_CLASSES,
-        num_layers=2)
-        model = UNet(**unet_kwargs)
-        return model 
+      unet_kwargs = dict(input_shape=(LCD.IMG_SIZE, LCD.IMG_SIZE, LCD.N_CHANNELS),num_classes=LCD.N_CLASSES,num_layers=2)
+      model = UNet(**unet_kwargs)
+      return model 
     
     class_weight = (1 / LCD.TRAIN_CLASS_COUNTS[2:])* LCD.TRAIN_CLASS_COUNTS[2:].sum() / (LCD.N_CLASSES-2)
     class_weight[LCD.IGNORED_CLASSES_IDX] = 0.
+    
     
     class_weight_dic={}
     for i in range(10):
@@ -92,6 +90,9 @@ if __name__ == '__main__':
         class_weight_dic[i]=0
       else:
         class_weight_dic[i]=class_weight[i-2]
+        
+     def get_model_DU():
+        return unet_model(N_CLASSES, PATCH_SZ, n_channels=N_BANDS, upconv=UPCONV, class_weights=CLASS_WEIGHTS)
 
     
 
@@ -122,32 +123,32 @@ if __name__ == '__main__':
               X_DICT_VALIDATION[img_id] = img_m[train_xsz:, :, :]
               Y_DICT_VALIDATION[img_id] = mask[train_xsz:, :, :]
               print(img_id + ' read')
-           except FileNotFoundError :
-            pass
+            except FileNotFoundError:
+              pass
         print('Images were read')
 
-         unet_kwargs = dict(input_shape=(LCD.IMG_SIZE, LCD.IMG_SIZE, LCD.N_CHANNELS),
+        unet_kwargs = dict(input_shape=(LCD.IMG_SIZE, LCD.IMG_SIZE, LCD.N_CHANNELS),
                   num_classes=LCD.N_CLASSES,
                   num_layers=2)
-         print("start train net")
-         x_train, y_train = get_patches(X_DICT_TRAIN, Y_DICT_TRAIN, n_patches=TRAIN_SZ, sz=PATCH_SZ)
-         x_val, y_val = get_patches(X_DICT_VALIDATION, Y_DICT_VALIDATION, n_patches=VAL_SZ, sz=PATCH_SZ)
+        print("start train net")
+        x_train, y_train = get_patches(X_DICT_TRAIN, Y_DICT_TRAIN, n_patches=TRAIN_SZ, sz=PATCH_SZ)
+        x_val, y_val = get_patches(X_DICT_VALIDATION, Y_DICT_VALIDATION, n_patches=VAL_SZ, sz=PATCH_SZ)
             
-         model = get_model()
+        model = get_model()
 
-         if os.path.isfile(weights_path):
+        if os.path.isfile(weights_path):
                 model.load_weights(weights_path)
             #model_checkpoint = ModelCheckpoint(weights_path, monitor='val_loss', save_weights_only=True, save_best_only=True)
             #early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=1, mode='auto')
             #reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.1, patience=5, min_lr=0.00001)
-          model_checkpoint = ModelCheckpoint(weights_path, monitor='val_loss', save_best_only=True)
-          csv_logger = CSVLogger('log_unet.csv', append=True, separator=';')
-          tensorboard = TensorBoard(log_dir='./tensorboard_unet/', write_graph=True, write_images=True)
-          model.fit(x_train, y_train, batch_size=config.batch_size, epochs=config.epochs,
+        model_checkpoint = ModelCheckpoint(weights_path, monitor='val_loss', save_best_only=True)
+        csv_logger = CSVLogger('log_unet.csv', append=True, separator=';')
+        tensorboard = TensorBoard(log_dir='./tensorboard_unet/', write_graph=True, write_images=True)
+        model.fit(x_train, y_train, batch_size=config.batch_size, epochs=config.epochs,
                       verbose=2, shuffle=True,
                       callbacks=[model_checkpoint, csv_logger, tensorboard],
                       classe_weight=class_weight_dic,
                       validation_data=(x_val, y_val))
             
-          model.save('/content/experiments/saved')
+        model.save('/content/experiments/saved')
 
