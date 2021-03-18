@@ -69,20 +69,39 @@ if __name__ == '__main__':
     PATCH_SZ = 160   # should divide by 16
     BATCH_SIZE = 32
     TRAIN_SZ = 15000  # train size
-    VAL_SZ = 3000    # validation size
+    VAL_SZ = 3491    # validation size
+    
+    
 
+    unet_kwargs = dict(
+        input_shape=(LCD.IMG_SIZE, LCD.IMG_SIZE, LCD.N_CHANNELS),
+        num_classes=LCD.N_CLASSES,
+        num_layers=2
+    )
+    
+    model = UNet(**unet_kwargs)
+    
+    class_weight = (1 / LCD.TRAIN_CLASS_COUNTS[2:])* LCD.TRAIN_CLASS_COUNTS[2:].sum() / (LCD.N_CLASSES-2)
+    class_weight[LCD.IGNORED_CLASSES_IDX] = 0.
+    
+    class_weight_dic={}
+    for i in range(10):
+      if i<=1:
+        class_weight_dic[i]=0
+      else:
+        class_weight_dic[i]=class_weight[i-2]
 
-    def get_model():
-        return unet_model(N_CLASSES, PATCH_SZ, n_channels=N_BANDS, upconv=UPCONV, class_weights=CLASS_WEIGHTS)
-
+    
 
     weights_path = 'weights'
     if not os.path.exists(weights_path):
         os.makedirs(weights_path)
-    weights_path += '/unet_weights.hdf5'
+    weights_path += '/content/unet_weights.hdf5'
 
     trainIds = [str(i).zfill(2) for i in range(1, 25)]  # all availiable ids: from "01" to "24"
-
+    print(trainIds)
+    
+    
 
     if __name__ == '__main__':
         X_DICT_TRAIN = dict()
@@ -92,8 +111,8 @@ if __name__ == '__main__':
 
         print('Reading images')
         for img_id in trainIds:
-            img_m = normalize(tiff.imread('./data/mband/{}.tif'.format(img_id)).transpose([1, 2, 0]))
-            mask = tiff.imread('./data/gt_mband/{}.tif'.format(img_id)).transpose([1, 2, 0]) / 255
+            img_m = normalize(tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/images/{}.tif'.format(img_id)).transpose([1, 2, 0]))
+            mask = tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/masks/masks/{}.tif'.format(img_id)).transpose([1, 2, 0]) / 255
             train_xsz = int(3/4 * img_m.shape[0])  # use 75% of image as train and 25% for validation
             X_DICT_TRAIN[img_id] = img_m[:train_xsz, :, :]
             Y_DICT_TRAIN[img_id] = mask[:train_xsz, :, :]
@@ -106,7 +125,7 @@ if __name__ == '__main__':
             print("start train net")
             x_train, y_train = get_patches(X_DICT_TRAIN, Y_DICT_TRAIN, n_patches=TRAIN_SZ, sz=PATCH_SZ)
             x_val, y_val = get_patches(X_DICT_VALIDATION, Y_DICT_VALIDATION, n_patches=VAL_SZ, sz=PATCH_SZ)
-            model = get_model()
+
             if os.path.isfile(weights_path):
                 model.load_weights(weights_path)
             #model_checkpoint = ModelCheckpoint(weights_path, monitor='val_loss', save_weights_only=True, save_best_only=True)
@@ -115,10 +134,12 @@ if __name__ == '__main__':
             model_checkpoint = ModelCheckpoint(weights_path, monitor='val_loss', save_best_only=True)
             csv_logger = CSVLogger('log_unet.csv', append=True, separator=';')
             tensorboard = TensorBoard(log_dir='./tensorboard_unet/', write_graph=True, write_images=True)
-            model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=N_EPOCHS,
+            model.fit(x_train, y_train, batch_size=config.batch_size, epochs=config.epochs,
                       verbose=2, shuffle=True,
                       callbacks=[model_checkpoint, csv_logger, tensorboard],
                       validation_data=(x_val, y_val))
+            
+            model.save('/content/experiments/saved')
             return model
 
         train_net()
