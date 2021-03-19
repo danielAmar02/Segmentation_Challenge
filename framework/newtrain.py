@@ -94,7 +94,7 @@ if __name__ == '__main__':
    
     
     def get_model(im_sz=PATCH_SZ,class_weights=class_weight_array):
-      model = unet_model(im_sz,class_weights,n_classes=4, n_channels=8, n_filters_start=32, growth_factor=2, upconv=True)
+      model = unet_model(im_sz,class_weights,n_classes=10, n_channels=4, n_filters_start=32, growth_factor=2, upconv=True)
       return model 
     
     
