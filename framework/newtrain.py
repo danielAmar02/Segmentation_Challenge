@@ -64,7 +64,7 @@ if __name__ == '__main__':
     config = _parse_args()
 
 
-    N_BANDS = 8
+    N_BANDS = 4
     N_CLASSES = 10 # buildings, roads, trees, crops and water
     CLASS_WEIGHTS = [0.2, 0.3, 0.1, 0.1, 0.3]
     N_EPOCHS = 2
@@ -91,7 +91,7 @@ if __name__ == '__main__':
    
     
     def get_model(im_sz=PATCH_SZ,class_weights=class_weight_array):
-      model = unet_model(im_sz,class_weights,n_classes=10, n_channels=8, n_filters_start=32, growth_factor=2, upconv=True)
+      model = unet_model(im_sz,class_weights,n_classes=4, n_channels=8, n_filters_start=32, growth_factor=2, upconv=True)
       return model 
     
     
