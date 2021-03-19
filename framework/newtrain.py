@@ -84,14 +84,13 @@ if __name__ == '__main__':
       if i<=1:
         class_weight_dic[i]=0
       else:
-        class_weight_dic[i]=class_weight[i-2]
-        class_weight_array[i]=class_weight[i-2]
+        class_weight_dic[i]=class_weight_aux[i-2]
+        class_weight_array[i]=class_weight_aux[i-2]
           
    
     
     def get_model(im_sz=PATCH_SZ,class_weights=class_weight_array):
-      model = unet_model(n_classes=10, im_sz, n_channels=8, n_filters_start=32, growth_factor=2, upconv=True,
-               class_weights)
+      model = unet_model(im_sz,class_weights,n_classes=10, n_channels=8, n_filters_start=32, growth_factor=2, upconv=True)
       return model 
     
     
