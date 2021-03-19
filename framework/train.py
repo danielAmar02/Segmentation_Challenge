@@ -16,6 +16,7 @@ from model import UNet
 from tensorflow_utils import plot_predictions
 from utils import YamlNamespace
 from os import path
+import os
 
 
 if not path.exists('/content/experiments'):
