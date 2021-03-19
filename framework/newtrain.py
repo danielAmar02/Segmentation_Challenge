@@ -2,6 +2,7 @@
 
 
 from gen_patches import *
+from newunet import*
 
 import os.path
 import numpy as np
@@ -17,6 +18,7 @@ import random
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import os
 
 from dataset import LandCoverData as LCD
 from dataset import parse_image, load_image_train, load_image_test
@@ -70,36 +72,31 @@ if __name__ == '__main__':
     BATCH_SIZE = 32
     TRAIN_SZ = 15000  # train size
     VAL_SZ = 3491    # validation size
-    
-    
-
    
-    
-    def get_model(IMG_SiZE,N_CHANNELS,N_CLASSES,num_layers):
-      unet_kwargs = dict(input_shape=(LCD.IMG_SIZE, LCD.IMG_SIZE, LCD.N_CHANNELS),num_classes=LCD.N_CLASSES,num_layers=2)
-      model = UNet(**unet_kwargs)
-      return model 
-    
-    class_weight = (1 / LCD.TRAIN_CLASS_COUNTS[2:])* LCD.TRAIN_CLASS_COUNTS[2:].sum() / (LCD.N_CLASSES-2)
-    class_weight[LCD.IGNORED_CLASSES_IDX] = 0.
+  
+    class_weight_aux = (1 / LCD.TRAIN_CLASS_COUNTS[2:])* LCD.TRAIN_CLASS_COUNTS[2:].sum() / (LCD.N_CLASSES-2)
+    #class_weight_aux[LCD.IGNORED_CLASSES_IDX] = 0.
     
     
     class_weight_dic={}
+    class_weight_array=np.zeros((10))
     for i in range(10):
       if i<=1:
         class_weight_dic[i]=0
       else:
         class_weight_dic[i]=class_weight[i-2]
-        
-     def get_model_DU():
-        return unet_model(N_CLASSES, PATCH_SZ, n_channels=N_BANDS, upconv=UPCONV, class_weights=CLASS_WEIGHTS)
-
+        class_weight_array[i]=class_weight[i-2]
+          
+   
+    
+    def get_model(im_sz=PATCH_SZ,class_weights=class_weight_array):
+      model = unet_model(n_classes=10, im_sz, n_channels=8, n_filters_start=32, growth_factor=2, upconv=True,
+               class_weights)
+      return model 
+    
     
 
-    weights_path = 'weights'
-    if not os.path.exists(weights_path):
-        os.makedirs(weights_path)
-    weights_path += '/content/unet_weights.hdf5'
+
 
     trainIds = [i for i in range(1, 23535)]  # all availiable ids: from "1" to "23535"
     print(trainIds)
@@ -116,7 +113,9 @@ if __name__ == '__main__':
         for img_id in trainIds:
             try :
               img_m = normalize(tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/images/{}.tif'.format(img_id)).transpose([1, 2, 0]))
-              mask = tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/masks/masks/{}.tif'.format(img_id)).transpose([1, 2, 0]) / 255
+              mask = tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/masks/masks/{}.tif'.format(img_id))
+              mask = mask[..., None]
+              mask=mask.transpose([1, 2, 0]) / 255
               train_xsz = int(3/4 * img_m.shape[0])  # use 75% of image as train and 25% for validation
               X_DICT_TRAIN[img_id] = img_m[:train_xsz, :, :]
               Y_DICT_TRAIN[img_id] = mask[:train_xsz, :, :]
@@ -127,9 +126,7 @@ if __name__ == '__main__':
               pass
         print('Images were read')
 
-        unet_kwargs = dict(input_shape=(LCD.IMG_SIZE, LCD.IMG_SIZE, LCD.N_CHANNELS),
-                  num_classes=LCD.N_CLASSES,
-                  num_layers=2)
+
         print("start train net")
         x_train, y_train = get_patches(X_DICT_TRAIN, Y_DICT_TRAIN, n_patches=TRAIN_SZ, sz=PATCH_SZ)
         x_val, y_val = get_patches(X_DICT_VALIDATION, Y_DICT_VALIDATION, n_patches=VAL_SZ, sz=PATCH_SZ)
