@@ -61,6 +61,7 @@ def _parse_args():
     return config
 
 if __name__ == '__main__':
+    config = _parse_args()
 
 
     N_BANDS = 8
@@ -68,7 +69,7 @@ if __name__ == '__main__':
     CLASS_WEIGHTS = [0.2, 0.3, 0.1, 0.1, 0.3]
     N_EPOCHS = 2
     UPCONV = True
-    PATCH_SZ = 160   # should divide by 16
+    PATCH_SZ = 64   # should divide by 16
     BATCH_SIZE = 32
     TRAIN_SZ = 15000  # train size
     VAL_SZ = 3491    # validation size
@@ -111,10 +112,9 @@ if __name__ == '__main__':
         print('Reading images')
         for img_id in trainIds:
             try :
-              img_m = normalize(tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/images/{}.tif'.format(img_id)).transpose([1, 2, 0]))
+              img_m = normalize(tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/images/{}.tif'.format(img_id)))
               mask = tiff.imread('/content/gdrive/MyDrive/Preligens/Train/images/masks/masks/{}.tif'.format(img_id))
-              mask = mask[..., None]
-              mask=mask.transpose([1, 2, 0]) / 255
+              mask = mask[..., None]/255
               train_xsz = int(3/4 * img_m.shape[0])  # use 75% of image as train and 25% for validation
               X_DICT_TRAIN[img_id] = img_m[:train_xsz, :, :]
               Y_DICT_TRAIN[img_id] = mask[:train_xsz, :, :]
@@ -143,7 +143,6 @@ if __name__ == '__main__':
         model.fit(x_train, y_train, batch_size=config.batch_size, epochs=config.epochs,
                       verbose=2, shuffle=True,
                       callbacks=[model_checkpoint, csv_logger, tensorboard],
-                      classe_weight=class_weight_dic,
                       validation_data=(x_val, y_val))
             
         model.save('/content/experiments/saved')
