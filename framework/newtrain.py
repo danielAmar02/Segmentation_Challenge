@@ -60,6 +60,9 @@ def _parse_args():
 
     return config
 
+
+  
+
 if __name__ == '__main__':
     config = _parse_args()
 
@@ -101,7 +104,10 @@ if __name__ == '__main__':
     trainIds = [i for i in range(1, 23535)]  # all availiable ids: from "1" to "23535"
     print(trainIds)
     
-    
+    weights_path = '/content/weights'
+    if not os.path.exists(weights_path):
+      os.makedirs(weights_path)
+      weights_path += '/unet_weights.hdf5'
 
     if __name__ == '__main__':
         X_DICT_TRAIN = dict()
