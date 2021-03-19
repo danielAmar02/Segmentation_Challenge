@@ -6,8 +6,7 @@ from keras.utils import plot_model
 from keras import backend as K
 
 
-def unet_model(n_classes=10, im_sz, n_channels=8, n_filters_start=32, growth_factor=2, upconv=True,
-               class_weights):
+def unet_model(im_sz,class_weights,n_classes=10, n_channels=8, n_filters_start=32, growth_factor=2, upconv=True):
     droprate=0.25
     n_filters = n_filters_start
     inputs = Input((im_sz, im_sz, n_channels))
