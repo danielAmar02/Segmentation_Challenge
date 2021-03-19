@@ -103,6 +103,13 @@ def unet_model(im_sz,class_weights,n_classes=10, n_channels=8, n_filters_start=3
     def weighted_binary_crossentropy(y_true, y_pred):
         class_loglosses = K.mean(K.binary_crossentropy(y_true, y_pred), axis=[0, 1, 2])
         return K.sum(class_loglosses * K.constant(class_weights))
+    
 
-    model.compile(optimizer=Adam(), loss=weighted_binary_crossentropy)
+    def weighted_categorical_crossentropy(y_true,y_pred):
+      
+      class_loglosses = K.mean(tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred))
+      return K.sum(class_loglosses * K.constant(class_weights))
+        
+    
+    model.compile(optimizer=Adam(), loss=weighted_categorical_crossentropy)
     return model
