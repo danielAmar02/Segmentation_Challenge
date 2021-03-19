@@ -144,7 +144,7 @@ if __name__ == '__main__':
         .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
     # Load the trained model saved to disk
-    model = tf.keras.models.load_model(str(config.xp_dir/f''))
+    model = tf.keras.models.load_model(str(config.xp_dir/f''),custom_objects={'weighted_categorical_crossentropy': weighted_categorical_crossentropy})
 
 
     print(f"Predict the vectors over the {config.set} dataset")
