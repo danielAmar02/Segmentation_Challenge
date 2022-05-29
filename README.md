@@ -1,5 +1,6 @@
 # Challenge on Land Cover Predictive Model
 
+
 Land cover mapping is a fundamental problem in Earth observation. Land cover is the observed physical material covering the Earth's surgace. Accurately predicting the physical materials in an environment has many applications, such as analysing the development of crops in agriculture and modeling the distribution of species in ecology.
 
 Training/Validation dataset: 18,491 (256x256 pixel) images of 4 bands (RGB-NIR) extracted from the Sentinel-2 sattelite. For each image, we have an associated Mask for the training dataset
