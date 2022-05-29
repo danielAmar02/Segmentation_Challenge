@@ -11,6 +11,7 @@ Test Dataset: 5000 images
 
 Evaluation metric : Kullback-Leibler divergence 
 
+Download data : [Xtrain](https://challengedata.ens.fr/participants/challenges/48/download/x-train), [Ytrain](https://challengedata.ens.fr/participants/challenges/48/download/y-train), [Xtest](https://challengedata.ens.fr/participants/challenges/48/download/x-test), [supplementary-files](https://challengedata.ens.fr/participants/challenges/48/download/supplementary-files)
 
 The goal of the challenge is to do segmentation on satellite images and to tell given an image the proportion of pixels for 8 classes (artificial, cultivated, broadleaf, coniferous, herbaceous, natural, snow, water). As expected, the dataset is higly imbalanced.
 
