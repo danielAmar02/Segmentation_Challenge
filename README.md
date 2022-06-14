@@ -1,7 +1,7 @@
 # Challenge on Land Cover Predictive Model
 
 
-Land cover mapping is a fundamental problem in Earth observation. Land cover is the observed physical material covering the Earth's surgace. Accurately predicting the physical materials in an environment has many applications, such as analysing the development of crops in agriculture and modeling the distribution of species in ecology.
+Land cover mapping is a fundamental problem in Earth observation. Land cover is the observed physical material covering the Earth's surface. Accurately predicting the physical materials in an environment has many applications, such as analysing the development of crops in agriculture and modeling the distribution of species in ecology.
 
 ![alt text](https://github.com/danielAmar02/challenge-ens/blob/main/Media/pres.jpg)
 
